@@ -1,0 +1,166 @@
+---
+title: "RCR"
+author: "Jay Hesselberth"
+date: "1/10/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+```{r load, message = FALSE}
+library(nihexporter)
+library(tidyverse)
+library(broom)
+```
+
+# Impactful grants
+
+To measure the "return" on the money the NIH invests in the research enterprise, we can compare the relationship between the new Relative Citation Ratio[^rcr] and project costs. We will examine the relationship between RCR and other variables including:
+
+  * project cost (overall for NIH and by institute)
+  * budget mechanism (e.g., RFA and PAR)
+  * type of grant (e.g. R01, P01, R21, etc.)
+  
+**Note:** Because the "impact" (RCR value) of a publication changes over time, and grants have an opportunity to accrue more publications over time, these numbers only reflect a snapshot.
+
+First, we're going to identify a smaller subset of data to work with.
+
+
+```{r rcr_data}
+# get the earliest fiscal.year associated with each project
+rcr_data <-
+  projects %>%
+  group_by(project.num) %>%
+  arrange(fiscal.year) %>%
+  slice(1) %>%
+  mutate(mech = stringr::str_extract(foa.number, "[PA|PAR|PAS|RFA]+")) %>%
+  select(project.num, institute, activity, mech)
+
+rcr_data <-
+  rcr_data %>%
+  left_join(publinks, by = 'project.num') %>%
+  left_join(publications, by = 'pmid') %>%
+  group_by(project.num, institute, activity, mech) %>%
+  nest(rcr, .key = rcr) %>%
+  mutate(rcr = map(rcr, "rcr"))
+
+# unnest the rcr values and remove NAs
+rcr_data <-
+  rcr_data %>%
+  unnest() %>%
+  na.omit()
+```
+
+The `rcr_data` now contains the following information for each project:
+
+```{r rcr_summary}
+```
+
+```{r select_activity}
+class_counts <- rcr_data %>%
+  select(project.num, activity) %>%
+  unique() %>% 
+  group_by(activity) %>%
+  summarize(n = n()) %>%
+  arrange(desc(n)) %>% 
+  filter(n > 100)
+
+ggplot(class_counts, aes(x = reorder(activity, -n), y = n)) +
+  geom_bar(stat = 'identity') +
+  scale_y_log10() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+```
+
+```{r rcr_institute, eval = FALSE}
+rcr_inst <-
+  rcr_data %>%
+  select(institute, fiscal.year, rcr)
+  
+ggplot(rcr_inst,
+       aes(x = factor(fiscal.year), y = rcr)) +
+  geom_boxplot(outlier.shape = NA) +
+  facet_wrap(~ institute) +
+  scale_y_log10() +
+  labs(x = 'Fiscal year',
+       y = 'RCR',
+       title = 'RCR distribution by institute')
+```
+
+### Impact by mechanism
+
+NIH funding is offered via several [different mechanisms](XXX).
+
+- **PA**: XXX
+- **PAR**: XXX
+- **PAS**: XXX
+- **RFA**: XXX
+
+One question is whether certain mechanisms are more effective in generating impactful publications. We will look at this by building a model that describes the relationship between dollars invested and the "impact" of papers.
+
+```{r rcr_model}
+
+plot_rcr_data <- function(rcr_data) {
+  ggplot(rcr_data, aes(rcr, total.cost)) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE) +
+    facet_wrap(~ institute + mech, scales = "free_y")
+}
+
+rcr_model_data <-
+  rcr_data %>%
+  left_join(project_io, by = 'project.num')
+
+model <- lm(rcr ~ institute + total.cost + activity + mech, rcr_model_data)
+model_tidy <- tidy(model) %>% as_data_frame()
+
+models
+
+intercepts <- 
+  models %>% ungroup() %>%
+  filter(term == '(Intercept)')
+
+intercepts
+
+centered_intercepts <-
+  intercepts %>%
+  group_by(institute) %>%
+  mutate(centered_intercept = estimate - mean(estimate)) %>%
+  ungroup()
+
+```
+
+```{r rcr_mechanism}
+library(gganimate)
+
+gp <-
+  ggplot(rcr_data, aes(x = mech, y = rcr, frame = fiscal.year)) +
+  geom_boxplot(outlier.shape = NA) +
+  scale_y_log10() +
+  labs(x = 'Funding mechanism',
+       y = 'RCR',
+       title = 'RCR distribution by funding mechanism')
+
+gganimate(gp)
+```
+
+```{r rcr_activity, eval = FALSE}
+
+activities <- c('R01','R21','U01','P01')
+
+rcr_activity <- rcr_data %>% filter(activity %in% activities)
+
+gp <- ggplot(rcr_activity,
+             aes(x = activity, y = rcr,
+                 frame = fiscal.year)) +
+  geom_boxplot(outlier.shape = NA) +
+  scale_y_log10() +
+  labs(x = 'Activity',
+       y = 'RCR',
+       total = 'RCR distribution by activity')
+
+gganimate(gp)
+```
