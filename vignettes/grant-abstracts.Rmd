@@ -1,0 +1,32 @@
+---
+title: "Semantic analysis of NIH grant abstracts"
+output:
+  rmarkdown::html_vignette: default
+  html_document:
+    code_folding: hide
+vignette: |
+  %\VignetteIndexEntry{Grant Abstract Semantics}
+  \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Words in abstracts
+
+```{r word_counts}
+library(nihexporter)
+library(tidytext)
+
+abstract_tokens %>% count(application.id, word)
+```
+
+## Sentiment analysis
+
+```{r sentiments}
+abstract_sentiments <- abstract_tokens %>%
+  inner_join(get_sentiments("bing"), by = "word")
+```
+
