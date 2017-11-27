@@ -21,7 +21,7 @@ download_files () {
     url="$urlbase/$zipfile"
 
     echo -n ">> downloading $zipfile ... "
-    
+
     if [[ -f "$dir/$zipfile" ]]; then
 
         # check file size
@@ -123,4 +123,15 @@ for year in ${years[@]}; do
     download_files $dir $urlbase $zipfile
 done
 
-unzip_files $dir 
+unzip_files $dir
+
+## ABSTRACTS -----------------------------------
+years=$(seq 1985 2016)
+dir="ABSTRACTS"
+
+for year in ${years[@]}; do
+  zipfile="RePORTER_PRJABS_C_FY$year.zip"
+  download_files $dir $urlbase $zipfile
+done
+
+unzip_files $dir

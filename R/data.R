@@ -97,3 +97,11 @@
 #' @source Computed from \link{projects} table.
 "project_io"
 
+#' Pre-computed abstract tokens
+#'
+#' @format A data frame with two variables: `application.id`, `word`.
+#'
+#' @source Computed from the ABSTRACTS tables. Abstracts are tokenized and stop
+#'   words are removed.
+#'
+"abstract_tokens"

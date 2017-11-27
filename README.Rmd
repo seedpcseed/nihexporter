@@ -87,7 +87,7 @@ devtools::install_github("jayhesselberth/nihexporter")
 
 * `project_io`: pre-computed `n.pubs`, `n.patents` and `project.cost` for each `project.num`.
 
-**Note:** [Abstracts](https://exporter.nih.gov/ExPORTER_Catalog.aspx?sid=0&index=1) from NIH EXPORTER are not provided because they significantly increase the size of the package.
+* `abstract_tokens`: pre-computed tokens from abstracts.
 
 ### Functions
 

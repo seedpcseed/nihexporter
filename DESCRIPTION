@@ -29,6 +29,7 @@ Suggests:
     animation,
     RSQLite (>= 1.0.0),
     RPostgreSQL,
+    tidytext,
 License: MIT + file LICENSE
 LazyData: true
 URL: http://github.com/jayhesselberth/nihexporter
