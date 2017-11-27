@@ -1,4 +1,4 @@
-## abstracts
+## abstracts. parse table and remove stop words.
 
 source('data-raw/common.R')
 library(tidytext)
@@ -16,7 +16,11 @@ abstracts.tbl <- load_tbl(path, col_types) %>%
 data(stop_words)
 abstract_tokens <-
   abstracts.tbl %>%
+  # head(100) %>% # testing
   unnest_tokens(word, abstract.text) %>%
-  anti_join(stop_words)
+  filter(word != "unreadable" & !str_detect(word, "[:digit:]+")) %>%
+  anti_join(stop_words) %>%
+  count(application.id, word) %>%
+  arrange(application.id, desc(n))
 
 use_data(abstract_tokens, compress = 'xz')

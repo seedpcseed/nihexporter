@@ -1,10 +1,12 @@
 # nihexporter 0.9.0.9000
 
 ## Major changes
- 
-- Reload `projects` data. `fy.cost` now spans 1985-2016. [TODO]
 
-- Recalculate `project_io` table. [TODO]
+- Provide `abstract_tokens` table containing words from abstracts spanning 1985-2016.
+ 
+- Reload `projects` data. `fy.cost` now spans 1985-2016.
+
+- Recalculate `project_io` table.
 
 - New `clinical_studies` table.
 
