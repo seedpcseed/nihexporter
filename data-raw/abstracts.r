@@ -23,4 +23,20 @@ abstract_tokens <-
   count(application.id, word) %>%
   arrange(application.id, desc(n))
 
-use_data(abstract_tokens, compress = 'xz')
+# split into two tables for efficient storage:
+# one containing words, another containg word counts
+abstract_words <-
+  abstract_tokens %>%
+  select(word) %>%
+  unique() %>%
+  arrange(word) %>%
+  mutate(word.id = row_number())
+
+abstract_word_counts <-
+  abstract_tokens %>%
+  left_join(abstract_words) %>%
+  select(-word) %>%
+  unique()
+
+use_data(abstract_words, compress = 'xz')
+use_data(abstract_word_counts, compress = 'xz')
