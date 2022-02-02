@@ -55,7 +55,7 @@ unzip_files () {
 }
 
 ## PROJECTS ------------------------------------
-years=$(seq 2010 2020)
+years=$(seq 1985 2020)
 dir='PROJECTS'
 
 for year in ${years[@]}; do
@@ -74,7 +74,7 @@ download_files $dir $urlbase $zipfile
 unzip_files $dir
 
 ## PUBLICATIONS --------------------------------
-years=$(seq 1980 2016)
+years=$(seq 1985 2020)
 dir='PUBLICATIONS'
 
 for year in ${years[@]}; do
@@ -85,7 +85,7 @@ done
 unzip_files $dir
 
 ## PUBLINKS ------------------------------------
-years=$(seq 1985 2016)
+years=$(seq 1985 2020)
 dir='PUBLINKS'
 
 for year in ${years[@]}; do
@@ -104,7 +104,7 @@ download_files $dir $urlbase $zipfile
 unzip_files $dir
 
 ## DUNS_FIXES ----------------------------------
-years=$(seq 2000 2008)
+years=$(seq 1985 2020)
 dir='DUNS_FIX'
 
 for year in ${years[@]}; do
