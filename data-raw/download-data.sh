@@ -55,7 +55,7 @@ unzip_files () {
 }
 
 ## PROJECTS ------------------------------------
-years=$(seq 1985 2020)
+years=$(seq 2010 2020)
 dir='PROJECTS'
 
 for year in ${years[@]}; do
